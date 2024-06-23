@@ -1,13 +1,22 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from typing import List
 from pydantic import BaseModel
 
+representatives_online = {
+    1:0.8,
+    2:0.4,
+    3:0.2,
+    4:0.6
+}
 app = FastAPI()
-
 class AgentInfo(BaseModel):
-    agent_id: int
+    representative_id: int
     bandwidth: float
-    
+
+class BandwidthChange(BaseModel):
+    representative_id: int
+    bandwidth_change: float
+
 # possible factors for representative score change
 # hume emotional factors
 # time of call (longer calls get penalized less and rewarded more, shorter calls get rewarded less and penalized more)
@@ -15,16 +24,25 @@ class AgentInfo(BaseModel):
 
 @app.get("/available", response_model=List[AgentInfo])
 def get_available_agents():
-    # Returning a fixed list of floats for now
-    agent_data = [
-        {"agent_id": 2, "bandwidth": 0.3},
-        {"agent_id": 3, "bandwidth": 0.6},
-        {"agent_id": 1, "bandwidth": 0.8},
-        {"agent_id": 4, "bandwidth": 0.7}
-    ]
     # Convert each dictionary to AgentInfo object
-    return [AgentInfo(**item) for item in agent_data]
+    representatives_list = []
+    for id, bandwidth in representatives_online.items():
+        representatives_list.append(AgentInfo(representative_id=id,bandwidth=bandwidth))
+    return representatives_list
+
+@app.post("/updatebandwidth", response_model=AgentInfo)
+def match(request: BandwidthChange):
+    try:
+        representative = request.representative_id
+        if representative in representatives_online:
+            representatives_online[representative] = representatives_online[representative] + request.bandwidth_change
+        return AgentInfo(representative_id=representative,bandwidth=representatives_online[representative])
+    except:
+        raise Exception("Invalid representative id.")
+
+
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8001)
