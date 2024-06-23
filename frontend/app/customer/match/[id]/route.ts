@@ -5,7 +5,7 @@ type Params = {
   id: string;
 };
 
-type PairData = {
+export type PairData = {
   pair: [CustomerAgreeableness, AgentBandwidth];
 };
 

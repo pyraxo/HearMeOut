@@ -4,6 +4,7 @@ import AgentCall from "@/components/AgentCall";
 import { getIssue, IssuePayload } from "@/utils/issues";
 import { useEffect, useState } from "react";
 import SyncLoader from "react-spinners/SyncLoader";
+import { PairData } from "../match/[id]/route";
 
 export default function CustomerLobby({ params }: { params: { id: string } }) {
   const [summary, setSummary] = useState<string | null>(null);
@@ -30,7 +31,8 @@ export default function CustomerLobby({ params }: { params: { id: string } }) {
   };
 
   const fetchPair = async () => {
-    const { pair } = await fetch(`/customer/match/${params.id}`).json();
+    const result = await fetch(`/customer/match/${params.id}`);
+    const { pair }: PairData = await result.json();
     const [customerAgreeableness, agentBandwidth] = pair;
     console.log(customerAgreeableness, agentBandwidth);
     const { agent_id } = agentBandwidth;
@@ -46,7 +48,7 @@ export default function CustomerLobby({ params }: { params: { id: string } }) {
   }, []);
 
   return (
-    <div className="flex flex-col justify-center items-center p-12 gap-4">
+    <div className="flex flex-col justify-center items-center p-12 gap-4 h-screen">
       {loading && <SyncLoader size={16} aria-label="Loading" />}
       <p>{summary ? `Issue: ${summary}` : "Loading issue..."}</p>
       <p>{category ? `Category: ${category}` : "Loading category..."}</p>
