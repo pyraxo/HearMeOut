@@ -1,0 +1,9 @@
+hume
+flask
+werkzeug
+fastapi
+sqlalchemy
+uvicorn
+python-multipart
+psycopg2-binary
+numpy

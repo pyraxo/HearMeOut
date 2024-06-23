@@ -1,23 +1,21 @@
 "use client";
-import { useVoice } from "@humeai/voice-react";
-import { Button } from "./ui/button";
-import { Mic, MicOff, Phone } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
-import { Toggle } from "./ui/toggle";
-import MicFFT from "./MicFFT";
 import { cn } from "@/utils";
+import { useVoice } from "@humeai/voice-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Mic, MicOff, Phone } from "lucide-react";
+import MicFFT from "./MicFFT";
+import { Button } from "./ui/button";
+import { Toggle } from "./ui/toggle";
 
 export default function Controls() {
   const { disconnect, status, isMuted, unmute, mute, micFft } = useVoice();
 
   return (
     <div
-      className={
-        cn(
-          "fixed bottom-0 left-0 w-full p-4 flex items-center justify-center",
-          "bg-gradient-to-t from-card via-card/90 to-card/0",
-        )
-      }
+      className={cn(
+        "fixed bottom-0 left-0 w-full p-4 flex items-center justify-center",
+        "bg-gradient-to-t from-card via-card/90 to-card/0"
+      )}
     >
       <AnimatePresence>
         {status.value === "connected" ? (
