@@ -105,10 +105,6 @@ export default function ClientComponent({
             // eslint-disable-next-line no-console
             console.error("close event was not nice", event);
           }
-
-          if (!redirectDept || !redirectDept.category) {
-            throw new Error("Redirect department not set");
-          }
         }}
       >
         <MessageDispatcher

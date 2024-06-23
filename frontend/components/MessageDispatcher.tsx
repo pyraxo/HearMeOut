@@ -4,7 +4,8 @@ import { useVoice } from "@humeai/voice-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { RedirectPayload } from "./Chat";
-import { postData } from "@/utils/api";
+// import { postData } from "@/utils/api";
+import { setIssue } from "@/utils/issues";
 
 export default function MessageDispatcher({
   userId,
@@ -23,11 +24,16 @@ export default function MessageDispatcher({
       (message) => message.type === "user_message"
     );
     if (messagesPayload.length === 0) return;
-    await postData(`/issue/${userId}`, {
+    setIssue(userId, {
+      summary: redirectDept.issue_summary ?? "",
+      category: redirectDept.category ?? "",
       messages: messagesPayload,
-      summary: redirectDept.issue_summary,
-      category: redirectDept.category,
     });
+    // await postData(`/issue/${userId}`, {
+    //   messages: messagesPayload,
+    //   summary: redirectDept.issue_summary,
+    //   category: redirectDept.category,
+    // });
   };
 
   useEffect(() => {

@@ -4,7 +4,8 @@
 import { useEffect, useRef, useState } from "react";
 import Peer from "peerjs";
 import AgentCall from "@/components/AgentCall";
-import { patchData } from "@/utils/api";
+// import { patchData } from "@/utils/api";
+import { updateIssue } from "@/utils/issues";
 
 const repEmoji = ["🙂", "😊", "😄"];
 
@@ -38,12 +39,14 @@ const PeerPage = () => {
     //     }
     //   });
     if (!callPlaceholder) return;
-    await patchData(`/issue/${callPlaceholder}`, { agentId });
+    updateIssue(callPlaceholder, { agentId });
+    // await patchData(`/issue/${callPlaceholder}`, { agentId });
     setCallerId(callPlaceholder);
   };
 
   const disconnectCall = async () => {
-    await patchData(`/issue/${callPlaceholder}`, { agentId: null });
+    updateIssue(callPlaceholder, { agentId: "" });
+    // await patchData(`/issue/${callPlaceholder}`, { agentId: null });
     setCallerId("");
   };
 
