@@ -1,0 +1,9 @@
+{
+    "Anger": 0.5,
+    "Disappointment": 0.5,
+    "Disgust": 0.2,
+    "Distress": 0.2,
+    "Horror": 0.2,
+    "Pain": 0.05,
+    "Sadness": 0.2
+}
