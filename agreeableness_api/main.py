@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 from typing import List, Dict
 import json
@@ -12,6 +12,10 @@ class Expression(BaseModel):
     id: str
     scores: List[Score]
 
+class Customer(BaseModel):
+    id: int
+    score: float
+
 # Read data from JSON file
 def read_json_data(filename):
     with open(filename, 'r') as file:
@@ -22,18 +26,18 @@ def read_json_data(filename):
 app = FastAPI()
 
 # Endpoint to retrieve scores
-@app.get("/expressions/", response_model=float)
-async def get_expressions():
+@app.post("/expressions/", response_model=Customer)
+async def get_expressions(request: Request):
     try:
-        data = read_json_data("angry.json")
+        data = await request.json()
+        customer_id = data["id"]
         expressions = []
-        for item in data:
+        for item in data["messages"]:
             scores =  item["models"]["prosody"]
             expressions.append(scores)
-            
         average_expression_scores = aggregate_expressions(expressions)
         customer_score = get_customer_score(average_expression_scores)
-        return customer_score
+        return Customer(id=customer_id,score=customer_score)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
