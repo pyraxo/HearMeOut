@@ -24,11 +24,14 @@ export default function MessageDispatcher({
       (message) => message.type === "user_message"
     );
     if (messagesPayload.length === 0) return;
-    setIssue(userId, {
-      summary: redirectDept.issue_summary ?? "",
-      category: redirectDept.category ?? "",
-      messages: messagesPayload,
-    });
+    localStorage.setItem(
+      userId,
+      JSON.stringify({
+        summary: redirectDept.issue_summary ?? "",
+        category: redirectDept.category ?? "",
+        messages: messagesPayload,
+      })
+    );
     // await postData(`/issue/${userId}`, {
     //   messages: messagesPayload,
     //   summary: redirectDept.issue_summary,

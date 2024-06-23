@@ -1,3 +1,4 @@
+"use client";
 export type IssuePayload = {
   summary: string;
   category: string;

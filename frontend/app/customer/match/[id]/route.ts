@@ -19,11 +19,14 @@ type AgentBandwidth = {
   bandwidth: number;
 };
 
-export async function POST(request: Request, context: { params: Params }) {
+export async function GET(_request: Request, context: { params: Params }) {
   const id = context.params.id;
   const issue = getIssue(id);
+  console.log("match issue", issue);
   if (!issue) {
-    return new Response("Not Found", { status: 404 });
+    return new Response(JSON.stringify({ error: "Not found" }), {
+      status: 404,
+    });
   }
   const result = await postData(
     `${process.env.NEXT_PUBLIC_AGREEABLE_API_URL}/expressions`,
@@ -32,8 +35,12 @@ export async function POST(request: Request, context: { params: Params }) {
       messages: issue?.messages,
     }
   );
+  console.log("match result", result);
+  console.log(`${process.env.NEXT_PUBLIC_AGREEABLE_API_URL}/expressions`);
   if (!result.ok) {
-    return new Response("Agreeable API failed", { status: 500 });
+    return new Response(JSON.stringify({ error: "Agreeable API failed" }), {
+      status: 500,
+    });
   }
   const { pair }: PairData = await result.json();
   return new Response(JSON.stringify({ pair }), { status: 200 });

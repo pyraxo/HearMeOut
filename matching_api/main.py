@@ -1,22 +1,34 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-import requests
 from typing import Dict, List, Tuple
 
+import requests
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 class AgentInfo(BaseModel):
-    agent_id: int
+    representative_id: str
     bandwidth: float
-    
+
+
 class CallInfo(BaseModel):
-    call_id: int
-    agreeableness: float    
+    call_id: str
+    agreeableness: float
+
 
 class MatchResponse(BaseModel):
     pair: Tuple
-    
-        
+
+
 @app.post("/match", response_model=MatchResponse)
 def match(request: CallInfo):
     try:
@@ -25,17 +37,21 @@ def match(request: CallInfo):
         values = response.json()
         agent_info_list = parse_agent_info(values)
         # 1 caller, multiple agents
-        pair = closest_to_1(request,agent_info_list)
-            
+        pair = closest_to_1(request, agent_info_list)
+
     except requests.exceptions.RequestException as e:
-        raise HTTPException(status_code=500, detail=f"Error fetching data from 8001: {e}")
+        raise HTTPException(
+            status_code=500, detail=f"Error fetching data from 8001: {e}")
     return MatchResponse(pair=pair)
+
 
 def parse_agent_info(data: List[Dict[str, float]]) -> List[AgentInfo]:
     agent_info_list = []
     for item in data:
-        agent_info_list.append(AgentInfo(agent_id=item['agent_id'], bandwidth=item['bandwidth']))
+        agent_info_list.append(
+            AgentInfo(representative_id=item['representative_id'], bandwidth=item['bandwidth']))
     return agent_info_list
+
 
 def closest_to_1(result: CallInfo, values: List[AgentInfo]) -> Tuple[CallInfo, AgentInfo]:
     closest_value = None
@@ -49,13 +65,14 @@ def closest_to_1(result: CallInfo, values: List[AgentInfo]) -> Tuple[CallInfo, A
 
     return (result, closest_value)
 
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
 
     """
     call - {"call_id": 10, "frustration_level": 0.6}
-    agent - {"agent_id" 2, "bandwidth": 0.3}
+    agent - {"representative_id" 2, "bandwidth": 0.3}
     
     [0.9,0.6,0.4,0.3]
     [0.3,0.5,0.6,0.2]

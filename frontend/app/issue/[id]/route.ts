@@ -24,7 +24,9 @@ export async function GET(_request: Request, context: { params: Params }) {
   const userId = context.params.id;
   const issue = getIssue(userId);
   if (!issue) {
-    return new Response("Not Found", { status: 404 });
+    return new Response(JSON.stringify({ error: "Not found" }), {
+      status: 404,
+    });
   }
   return new Response(JSON.stringify(issue), { status: 200 });
 }
