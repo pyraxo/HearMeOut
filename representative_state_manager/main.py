@@ -33,14 +33,16 @@ def get_available_agents():
 @app.post("/updatebandwidth", response_model=AgentInfo)
 def match(request: BandwidthChange):
     try:
+        print(request)
         representative = request.representative_id
         if representative in representatives_online:
             representatives_online[representative] = representatives_online[representative] + request.bandwidth_change
+            print("representative online and selected: " + str(representative))
+        print("representative updated: " +  str(representatives_online[representative]))
         return AgentInfo(representative_id=representative,bandwidth=representatives_online[representative])
     except:
+        print("some exception happened")
         raise Exception("Invalid representative id.")
-
-
 
 if __name__ == "__main__":
     import uvicorn
