@@ -34,5 +34,6 @@ export async function PATCH(request: Request, context: { params: Params }) {
   const userId = context.params.id;
 
   updateIssue(userId, { agentId: body.agentId });
+  const issue = getIssue(userId);
   return new Response(JSON.stringify(issue), { status: 200 });
 }

@@ -17,6 +17,9 @@ app.use(express.static("public"));
 
 const peerServer = ExpressPeerServer(server, {
   allow_discovery: true,
+  corsOptions: {
+    origin: "*",
+  },
 });
 
 app.use("/discovery", peerServer);

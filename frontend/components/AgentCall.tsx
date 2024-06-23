@@ -1,7 +1,8 @@
+"use client";
 import Peer, { MediaConnection } from "peerjs";
 import { useEffect, useRef, useState } from "react";
 
-export default function AgentCall({
+export default function AgentCallClient({
   userId,
   incomingId,
   onStart,
@@ -23,12 +24,18 @@ export default function AgentCall({
         video: false,
         audio: true,
       })
-      .then((stream) => {
+      .then(async (stream) => {
+        const RecordRTC = (await import("recordrtc")).default;
         const call = peerInstance?.call(incomingId, stream);
         if (call) {
+          const recorder = new RecordRTC.RecordRTCPromisesHandler(stream, {
+            type: "audio",
+            recorderType: RecordRTC.StereoAudioRecorder,
+          });
           call.on("stream", (userVideoStream) => {
             if (callingVideoRef.current) {
               callingVideoRef.current.srcObject = userVideoStream;
+              recorder.startRecording();
             }
           });
           call.on("close", () => {
@@ -37,6 +44,10 @@ export default function AgentCall({
               callRef.current?.close();
               callRef.current = null;
               if (onStop) onStop();
+              recorder.stopRecording();
+              recorder.getDataURL().then((data: string) => {
+                console.log(data);
+              });
             }
           });
           callRef.current = call;
