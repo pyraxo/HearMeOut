@@ -61,6 +61,41 @@ const Messages = forwardRef<
               );
             }
 
+            if (msg.type === "tool_call") {
+              return (
+                <motion.div
+                  key={msg.type + index}
+                  className={cn(
+                    "w-[80%]",
+                    "bg-card",
+                    "border border-border rounded",
+                    "ml-auto"
+                  )}
+                  initial={{
+                    opacity: 0,
+                    y: 10,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    y: 0,
+                  }}
+                  exit={{
+                    opacity: 0,
+                    y: 0,
+                  }}
+                >
+                  <div
+                    className={cn(
+                      "text-xs capitalize font-medium leading-none opacity-50 pt-4 px-3"
+                    )}
+                  >
+                    {msg.tool_call_id}
+                  </div>
+                  <div className={"pb-3 px-3"}>{msg.parameters}</div>
+                </motion.div>
+              );
+            }
+
             return null;
           })}
         </AnimatePresence>
