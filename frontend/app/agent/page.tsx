@@ -1,7 +1,7 @@
 // src/app/peer/peer.tsx
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Peer from "peerjs";
 import AgentCall from "@/components/AgentCall";
 // import { patchData } from "@/utils/api";

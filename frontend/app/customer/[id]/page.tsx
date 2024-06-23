@@ -36,6 +36,7 @@ export default function CustomerLobby({ params }: { params: { id: string } }) {
     const [customerAgreeableness, agentBandwidth] = pair;
     console.log(customerAgreeableness, agentBandwidth);
     const { agent_id } = agentBandwidth;
+    setAgentId(agent_id);
   };
 
   useEffect(() => {
@@ -43,6 +44,7 @@ export default function CustomerLobby({ params }: { params: { id: string } }) {
   }, [loading]);
 
   useEffect(() => {
+    fetchPair();
     fetchIssue();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
