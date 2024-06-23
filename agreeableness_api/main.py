@@ -25,7 +25,7 @@ app = FastAPI()
 @app.get("/expressions/", response_model=float)
 async def get_expressions():
     try:
-        data = read_json_data("expressions_list.json")
+        data = read_json_data("angry.json")
         expressions = []
         for item in data:
             scores =  item["models"]["prosody"]
@@ -51,12 +51,10 @@ def aggregate_expressions(expressions):
     for total_score in total_expression_scores: # getting the average expression score
         total_expression_scores[total_score] = total_expression_scores[total_score]/expressions_count
     average_expression_scores = total_expression_scores
+    print(average_expression_scores)
     return average_expression_scores
         
-        
-def get_customer_score(average_expression_scores):
-    print(average_expression_scores)
-    
+def get_customer_score(average_expression_scores):    
     # negative
     anger = average_expression_scores["Anger"]
     disappointment = average_expression_scores["Disappointment"]
@@ -74,27 +72,22 @@ def get_customer_score(average_expression_scores):
 
     negative_thresholds = read_json_data("negative_thresholds.json")
     positive_thresholds = read_json_data("positive_thresholds.json")
-    print(negative_thresholds)
-    print(positive_thresholds)
 
     base_score = -1.0
     for name, threshold in negative_thresholds.items():
-        print(average_expression_scores)
-        print(name)
-        print(threshold)
         if average_expression_scores[name] > threshold:
             base_score = 0.3
             break
     if base_score < 0:
-        for name, threshold in positive_thresholds:
+        for name, threshold in positive_thresholds.items():
             if average_expression_scores[name] > threshold:
                 base_score = 0.7
                 break
     if base_score < 0:
         base_score = 0.5
     
-    positive_expression_points = joy * 1 + love * 2 + satisfaction * 0.5 + calmness * 0.5
-    negative_expression_points = anger * 0.05 + disappointment * 0.05 + disgust * 0.05 + distress * 0.1 + horror * 0.1 + pain * 0.8 + sadness * 0.7
+    positive_expression_points = joy * 0.7 + love * 0.7 + satisfaction * 0.5 + calmness * 0.1
+    negative_expression_points = anger * 0.07 + disappointment * 0.07 + disgust * 0.05 + distress * 0.1 + horror * 0.1 + pain * 0.8 + sadness * 0.8
     
     final_score = base_score - negative_expression_points + positive_expression_points
     if final_score > 1:
