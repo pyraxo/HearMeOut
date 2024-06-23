@@ -4,12 +4,11 @@
 import { useEffect, useRef, useState } from "react";
 import Peer from "peerjs";
 import AgentCall from "@/components/AgentCall";
+import { patchData } from "@/utils/api";
 
 const repEmoji = ["🙂", "😊", "😄"];
 
 const PeerPage = () => {
-  const myVideoRef = useRef<HTMLVideoElement>(null);
-  const callingVideoRef = useRef<HTMLVideoElement>(null);
   const [callerId, setCallerId] = useState("");
 
   const [peerInstance, setPeerInstance] = useState<Peer | null>(null);
@@ -18,11 +17,9 @@ const PeerPage = () => {
   const [agentId, setagentId] = useState<string>("");
   const [idToCall, setIdToCall] = useState("");
 
-  const generateRandomString = () => Math.random().toString(36).substring(2);
-
   // Here we declare a function to call the identifier and retrieve
   // its video stream.
-  const handleCall = () => {
+  const handleCall = async () => {
     // navigator.mediaDevices
     //   .getUserMedia({
     //     video: false,
@@ -40,7 +37,14 @@ const PeerPage = () => {
     //       });
     //     }
     //   });
+    if (!callPlaceholder) return;
+    await patchData(`/issue/${callPlaceholder}`, { agentId });
     setCallerId(callPlaceholder);
+  };
+
+  const disconnectCall = async () => {
+    await patchData(`/issue/${callPlaceholder}`, { agentId: null });
+    setCallerId("");
   };
 
   useEffect(() => {
@@ -55,23 +59,17 @@ const PeerPage = () => {
 
         setPeerInstance(peer);
 
-        navigator.mediaDevices
-          .getUserMedia({
-            video: false,
-            audio: true,
-          })
-          .then((stream) => {
-            peer.on("call", (call) => {
-              call.answer(stream);
-              call.on("stream", (userVideoStream) => {
-                // if (callingVideoRef.current) {
-                //   callingVideoRef.current.srcObject = userVideoStream;
-                //   setCallerId(call.peer);
-                // }
-                setCallerId(call.peer);
-              });
-            });
-          });
+        peer.on("call", (call) => {
+          setCallerId(call.peer);
+        });
+        peer.on("close", () => {
+          console.log("peer closed");
+          setCallerId("");
+        });
+        peer.on("disconnected", () => {
+          console.log("peer disconnected");
+          setCallerId("");
+        });
       }
       return () => {
         if (peer) {
@@ -82,7 +80,7 @@ const PeerPage = () => {
   }, [agentId]);
 
   return (
-    <div className="flex flex-col justify-center items-center p-12">
+    <div className="flex flex-col justify-center items-center p-12 gap-4">
       <span className="text-9xl">😊</span>
       <p>{agentId ? `your id: ${agentId}` : "no id specified"}</p>
       {/* <audio ref={myVideoRef} autoPlay /> */}
@@ -94,12 +92,14 @@ const PeerPage = () => {
       />
       <button onClick={() => setagentId(agentPlaceholder)}>set name</button>
       <input
-        className="text-black text-center"
+        className="text-black text-center rounded-sm"
         placeholder="call id"
         value={callPlaceholder}
         onChange={(e) => setCallPlaceholder(e.target.value)}
       />
-      <button onClick={handleCall}>call</button>
+      <button onClick={callerId ? disconnectCall : handleCall}>
+        {callerId ? "disconnect" : "connect"}
+      </button>
       <AgentCall userId={agentId} incomingId={callerId} />
       {callerId && <span>{callerId} is calling</span>}
     </div>

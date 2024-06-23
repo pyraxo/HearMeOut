@@ -4,12 +4,7 @@ import { useVoice } from "@humeai/voice-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { RedirectPayload } from "./Chat";
-
-const namesToRoutes: { [key: string]: string } = {
-  "Returns and Refunds": "/customer/returns",
-  Payment: "/customer/payment",
-  "Shipment Tracking": "/customer/shipment",
-};
+import { postData } from "@/utils/api";
 
 export default function MessageDispatcher({
   userId,
@@ -23,25 +18,15 @@ export default function MessageDispatcher({
   const { disconnect, messages } = useVoice();
   const router = useRouter();
 
-  const sendMessages = async () => {
+  const createIssue = async () => {
     const messagesPayload = messages.filter(
       (message) => message.type === "user_message"
     );
     if (messagesPayload.length === 0) return;
-    await fetch(`/issue/${userId}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        messages: messagesPayload,
-        summary: redirectDept.issue_summary,
-        category: redirectDept.category,
-      }),
-    });
-    console.log({
-      id: userId,
+    await postData(`/issue/${userId}`, {
       messages: messagesPayload,
+      summary: redirectDept.issue_summary,
+      category: redirectDept.category,
     });
   };
 
@@ -49,15 +34,12 @@ export default function MessageDispatcher({
     const { category, issue_summary } = redirectDept;
     if (!category || !issue_summary) return;
     if (toArchive) {
-      setTimeout(() => {
-        disconnect();
-        router.push(
-          `${namesToRoutes[category]}?${new URLSearchParams({
-            issue: issue_summary,
-          })}`
-        );
-      }, 1000);
-      sendMessages();
+      createIssue().then(() => {
+        setTimeout(() => {
+          disconnect();
+          router.push(`/customer/${userId}`);
+        }, 2000);
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toArchive, redirectDept]);

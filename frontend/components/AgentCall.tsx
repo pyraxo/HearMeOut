@@ -1,14 +1,19 @@
-import Peer from "peerjs";
+import Peer, { MediaConnection } from "peerjs";
 import { useEffect, useRef, useState } from "react";
 
 export default function AgentCall({
   userId,
   incomingId,
+  onStart,
+  onStop,
 }: {
   userId: string;
   incomingId?: string;
+  onStart?: () => void;
+  onStop?: () => void;
 }) {
   const callingVideoRef = useRef<HTMLVideoElement>(null);
+  const callRef = useRef<MediaConnection | null>(null);
   const [peerInstance, setPeerInstance] = useState<Peer | null>(null);
 
   const handleCall = () => {
@@ -26,6 +31,15 @@ export default function AgentCall({
               callingVideoRef.current.srcObject = userVideoStream;
             }
           });
+          call.on("close", () => {
+            if (callingVideoRef.current) {
+              callingVideoRef.current.srcObject = null;
+              callRef.current?.close();
+              callRef.current = null;
+              if (onStop) onStop();
+            }
+          });
+          callRef.current = call;
         }
       });
   };
@@ -34,7 +48,15 @@ export default function AgentCall({
     if (incomingId) {
       console.log(incomingId);
       handleCall();
+    } else {
+      if (callingVideoRef.current) {
+        callingVideoRef.current.srcObject = null;
+        callRef.current?.close();
+        callRef.current = null;
+        if (onStop) onStop();
+      }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [incomingId]);
 
   useEffect(() => {
@@ -60,6 +82,7 @@ export default function AgentCall({
               call.on("stream", (userVideoStream) => {
                 if (callingVideoRef.current) {
                   callingVideoRef.current.srcObject = userVideoStream;
+                  if (onStart) onStart();
                 }
               });
             });

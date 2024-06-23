@@ -6,6 +6,7 @@ import { Moon, Sun } from "lucide-react";
 import Github from "./logos/GitHub";
 // import HumeLogo from "./logos/Hume";
 import { Button } from "./ui/button";
+import Link from "next/link";
 
 export const Nav = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -37,7 +38,9 @@ export const Nav = () => {
       </div> */}
       <div>
         <strong>
-          <h1>HearMeOut</h1>
+          <h1>
+            <Link href="/">HearMeOut</Link>
+          </h1>
         </strong>
       </div>
       <div className={"ml-auto flex items-center gap-1"}>
