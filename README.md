@@ -19,7 +19,7 @@ More details about our implementation can be found in our software architecture 
 ## Accomplishments that we're proud of
 1. Decoupled Microservice-based architecture We spent a significant amount of time planning out HearMeOut's architecture, and eventually came up with a decoupled microservice-based architecture, connected through REST APIs. Building our project in such a way allows for individual components to be modified easily, leaving the door wide open for future improvements. This architecture makes HearMeOut scalable from the get-go.
 
-What's next for HearMeOut
+## What's next for HearMeOut
 1. Incorporation of initially planned features We cut our initial scope down to deliver our project in time. We'd love to go back and work on database integration, incorporation of other LLMs for improved matching results, and improvements to the matching algorithm itself .
 
 2. Help from subject-matter experts Benchmarking is always a challenge. Assessing our outputs through the eyes of a subject-matter expert such as a behavioural scientist would give us more insight into steps we can take to generate more salient responses.
